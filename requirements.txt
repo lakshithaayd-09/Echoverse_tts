@@ -1,3 +1,5 @@
+python
 streamlit
 gtts
 deep-translator
+HTML/CSS
