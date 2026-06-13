@@ -1,5 +1,5 @@
 python
 streamlit
 gtts
-deep-translator
+deep_translator
 HTML/CSS
