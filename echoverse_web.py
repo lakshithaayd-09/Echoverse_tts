@@ -237,7 +237,7 @@ language = language_options[selected_language]
 
 # ---------------- Generate Audio ----------------
 
-if st.button("🎧 Generate Audio"):
+if st.button("🎧 GENERATE AUDIO"):
 
 
     if not text.strip():
