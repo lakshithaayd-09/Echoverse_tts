@@ -122,4 +122,4 @@ if st.button("✨ Generate Audiobook", use_container_width=True):
 st.divider()
 st.caption("EchoVerse | Turning text into listening experiences 🎶")
 
-            )
+            
