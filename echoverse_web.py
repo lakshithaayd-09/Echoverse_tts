@@ -50,10 +50,12 @@ html, body, [class*="css"] {
 
 /* Brand */
 .brand {
-    color: var(--purple-dark);
-    font-size: 1.65rem;
-    font-weight: 800;
-    letter-spacing: -1px;
+    font-size: 56px;
+    font-weight: 900;
+    color: #59417f;
+    line-height: 1.1;
+    letter-spacing: -2px;
+    text-align: center;
 }
 
 .brand-note {
@@ -246,12 +248,7 @@ with st.expander("Voice and language settings", expanded=True):
     languages = {
         "English": "en",
         "Hindi": "hi",
-        "French": "fr",
-        "Spanish": "es",
-        "Japanese": "ja",
-        "German": "de",
-        "Telugu": "te",
-        "Tamil": "ta"
+        
     }
 
     language = st.selectbox(
@@ -264,11 +261,7 @@ with st.expander("Voice and language settings", expanded=True):
         ["Neutral", "Calm", "Excited", "Suspenseful"]
     )
 
-    st.caption(
-        "Calm uses slower speech. The other moods are preferences; "
-        "gTTS does not provide genuine emotional voice acting."
-    )
-
+    
 # -------------------- GENERATE AUDIO --------------------
 
 st.write("")
