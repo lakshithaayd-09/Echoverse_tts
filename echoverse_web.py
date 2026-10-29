@@ -2,6 +2,7 @@
 import streamlit as st
 from gtts import gTTS
 from io import BytesIO
+from deep_translator import GoogleTranslator
 
 st.set_page_config(
     page_title="EchoVerse — A Little Space for Stories",
@@ -266,16 +267,39 @@ with st.expander("Voice and language settings", expanded=True):
 
 st.write("")
 
-if st.button("♫   Let's listen", use_container_width=True):
+
+if st.button("✨ Generate Audiobook", use_container_width=True):
     if not text_input.strip():
-        st.warning("Add a little text first, and your story is ready to begin.")
+        st.warning("Please enter text or upload a .txt file.")
+
     else:
         try:
-            with st.spinner("Preparing your listening experience..."):
+            with st.spinner("Translating your text..."):
+                translated_text = GoogleTranslator(
+                    source="auto",
+                    target=languages[language]
+                ).translate(text_input.strip())
+
+            if not translated_text:
+                st.error("Translation failed. Please try again.")
+                st.stop()
+
+            st.success(f"Text translated to {language}!")
+
+            # Display the translated text
+            st.subheader("Your translated text")
+            st.text_area(
+                "Review your text before listening",
+                value=translated_text,
+                height=180,
+                disabled=True
+            )
+
+            with st.spinner("Creating your audiobook..."):
                 audio_buffer = BytesIO()
 
                 speech = gTTS(
-                    text=text_input.strip(),
+                    text=translated_text,
                     lang=languages[language],
                     slow=(tone == "Calm")
                 )
@@ -283,17 +307,24 @@ if st.button("♫   Let's listen", use_container_width=True):
                 speech.write_to_fp(audio_buffer)
                 audio_data = audio_buffer.getvalue()
 
-            st.success("Your story is ready. Make yourself comfortable.")
-
+            st.success("Your audiobook is ready!")
             st.audio(audio_data, format="audio/mp3")
 
             st.download_button(
-                "↓   Keep a copy of your audiobook",
+                "⬇️ Download Audiobook",
                 data=audio_data,
-                file_name="EchoVerse_Audiobook.mp3",
+                file_name=f"EchoVerse_{language}_Audiobook.mp3",
                 mime="audio/mpeg",
                 use_container_width=True
             )
+
+        except Exception as error:
+            st.error(
+                "Translation or audio generation failed. "
+                "Please check your internet connection and try again."
+            )
+            st.caption(str(error))
+
 
         except Exception as error:
             st.error(
