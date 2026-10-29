@@ -265,8 +265,10 @@ with st.expander("Voice and language settings", expanded=True):
     
 # -------------------- GENERATE AUDIO --------------------
 
-st.write("")
 
+# -------------------- GENERATE AUDIO --------------------
+
+st.write("")
 
 if st.button("✨ Generate Audiobook", use_container_width=True):
     if not text_input.strip():
@@ -274,25 +276,37 @@ if st.button("✨ Generate Audiobook", use_container_width=True):
 
     else:
         try:
-            with st.spinner("Translating your text..."):
-                translated_text = GoogleTranslator(
-                    source="auto",
-                    target=languages[language]
-                ).translate(text_input.strip())
+            target_language = languages[language]
+            original_text = text_input.strip()
+
+            with st.spinner("Preparing your story..."):
+                # Keep the text unchanged if English is selected.
+                # Translate into Hindi when Hindi is selected.
+                if target_language == "en":
+                    translated_text = original_text
+                else:
+                    translated_text = GoogleTranslator(
+                        source="auto",
+                        target=target_language
+                    ).translate(original_text)
 
             if not translated_text:
                 st.error("Translation failed. Please try again.")
                 st.stop()
 
-            st.success(f"Text translated to {language}!")
+            if target_language == "en":
+                st.success("Your English text is ready!")
+            else:
+                st.success(f"Your text is ready in {language}!")
 
-            # Display the translated text
-            st.subheader("Your translated text")
+            st.subheader("Your story, ready to listen")
+
             st.text_area(
                 "Review your text before listening",
                 value=translated_text,
                 height=180,
-                disabled=True
+                disabled=True,
+                key="translated_story"
             )
 
             with st.spinner("Creating your audiobook..."):
@@ -300,7 +314,7 @@ if st.button("✨ Generate Audiobook", use_container_width=True):
 
                 speech = gTTS(
                     text=translated_text,
-                    lang=languages[language],
+                    lang=target_language,
                     slow=(tone == "Calm")
                 )
 
@@ -320,19 +334,13 @@ if st.button("✨ Generate Audiobook", use_container_width=True):
 
         except Exception as error:
             st.error(
-                "Translation or audio generation failed. "
+                "We couldn't translate your text or create the audio. "
                 "Please check your internet connection and try again."
             )
-            st.caption(str(error))
 
-
-        except Exception as error:
-            st.error(
-                "We couldn't create the audio just now. "
-                "Please check your internet connection and try again."
-            )
             with st.expander("Technical details"):
                 st.code(str(error))
+
 
 # -------------------- FOOTER --------------------
 
