@@ -4,95 +4,281 @@ from gtts import gTTS
 from io import BytesIO
 
 st.set_page_config(
-    page_title="EchoVerse - An AudioBook",
+    page_title="EchoVerse — A Little Space for Stories",
     page_icon="🎧",
     layout="centered"
 )
 
+# -------------------- DESIGN --------------------
+
 st.markdown("""
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --ink: #51415e;
+    --muted: #897b94;
+    --purple: #80638f;
+    --purple-dark: #684d79;
+    --lavender: #f0e9f7;
+    --border: #e7ddec;
+}
+
+/* Soft, barely-there lavender with hazy corners */
 .stApp {
-    background: linear-gradient(135deg, #f5f0ff, #e8f4ff);
+    background:
+        radial-gradient(ellipse at 0% 0%,
+            rgba(202, 174, 226, 0.30), transparent 32%),
+        radial-gradient(ellipse at 100% 100%,
+            rgba(211, 190, 235, 0.32), transparent 34%),
+        radial-gradient(ellipse at 100% 0%,
+            rgba(226, 211, 241, 0.20), transparent 25%),
+        #faf8fc;
+    color: var(--ink);
+    font-family: 'Nunito', sans-serif;
 }
-h1 {
-    color: #493477;
+
+html, body, [class*="css"] {
+    font-family: 'Nunito', sans-serif;
+}
+
+.block-container {
+    max-width: 820px;
+    padding-top: 2rem;
+    padding-bottom: 4rem;
+}
+
+/* Brand */
+.brand {
+    color: var(--purple-dark);
+    font-size: 1.65rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+.brand-note {
+    color: var(--muted);
+    font-size: 0.78rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+/* Welcome section */
+.welcome {
+    padding: 3.2rem 0 2.2rem 0;
+}
+
+.eyebrow {
+    color: #967da5;
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+
+.hero-title {
+    color: #51405e;
+    font-size: clamp(2.1rem, 5vw, 3.3rem);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    line-height: 1.15;
+    margin: 0 0 1rem 0;
+}
+
+.hero-description {
+    color: #82738d;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    max-width: 560px;
+}
+
+/* Section headings */
+.section-heading {
+    color: #5b4768;
+    font-size: 1.15rem;
+    font-weight: 800;
+    margin-bottom: 0.3rem;
+}
+
+.section-note {
+    color: #95879d;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+/* Input area */
+.stTextArea textarea {
+    background: rgba(244, 238, 249, 0.90) !important;
+    color: #51415e !important;
+    border: 1px solid #e5d9ed !important;
+    border-radius: 16px !important;
+    padding: 18px !important;
+    font-family: 'Nunito', sans-serif !important;
+    font-size: 1rem !important;
+    line-height: 1.8 !important;
+    box-shadow: none !important;
+}
+
+.stTextArea textarea:focus {
+    border-color: #b9a0cc !important;
+    box-shadow: 0 0 0 2px rgba(185, 160, 204, 0.14) !important;
+}
+
+.stTextArea textarea::placeholder {
+    color: #a99bb2 !important;
+}
+
+/* Labels and dropdowns */
+label, .stSelectbox label, .stFileUploader label {
+    color: #655270 !important;
+    font-weight: 700 !important;
+}
+
+.stSelectbox [data-baseweb="select"] > div {
+    background: #fff !important;
+    border-color: #e5d9ed !important;
+    border-radius: 12px !important;
+}
+
+/* Buttons */
+.stButton > button,
+.stDownloadButton > button {
+    background: #80638f !important;
+    color: white !important;
+    border: 1px solid #80638f !important;
+    border-radius: 12px !important;
+    padding: 0.7rem 1.2rem !important;
+    font-family: 'Nunito', sans-serif !important;
+    font-weight: 800 !important;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.stButton > button:hover,
+.stDownloadButton > button:hover {
+    background: #684d79 !important;
+    border-color: #684d79 !important;
+    transform: translateY(-1px);
+}
+
+/* File upload */
+[data-testid="stFileUploader"] {
+    background: rgba(255,255,255,0.55);
+    border: 1px dashed #d5c4e1;
+    border-radius: 14px;
+    padding: 12px;
+}
+
+/* Audio player */
+audio {
+    width: 100%;
+    border-radius: 12px;
+}
+
+/* Quiet footer */
+.footer {
+    color: #a092aa;
     text-align: center;
+    font-size: 0.82rem;
+    padding-top: 2rem;
 }
-.subtitle {
-    text-align: center;
-    color: #625778;
-    font-size: 17px;
-}
-.stButton > button {
-    background-color: #6547a5;
-    color: white;
-    border-radius: 10px;
-    padding: 10px 20px;
+
+hr {
+    border-color: #e9e0ef !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
-st.title("🎧 EchoVerse")
+# -------------------- HEADER --------------------
+
+st.markdown("""
+<div class="brand">echoverse<span style="color:#b69ac8">.</span></div>
+<div class="brand-note">a little space for stories</div>
+
+<div class="welcome">
+    <div class="eyebrow">Your own little reading nook</div>
+    <div class="hero-title">Some stories deserve<br>to be heard.</div>
+    <div class="hero-description">
+        Bring your favourite words, settle in, and let EchoVerse
+        read them to you. A quiet little space to turn reading
+        into listening.
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+# -------------------- TEXT INPUT --------------------
+
 st.markdown(
-    '<p class="subtitle">Your words, your world, your audiobook.</p>',
+    '<div class="section-heading">What shall we listen to today?</div>',
     unsafe_allow_html=True
 )
 
-st.write("Transform written text into audio you can listen to anywhere.")
-
-languages = {
-    "English": "en",
-    "Hindi": "hi",
-    "French": "fr",
-    "Spanish": "es",
-    "Japanese": "ja",
-    "German": "de",
-    "Telugu": "te",
-    "Tamil": "ta"
-}
-
-language = st.selectbox(
-    "🌍 Choose your language",
-    list(languages.keys())
-)
-
-tone = st.selectbox(
-    "🎭 Choose your reading mood",
-    ["Neutral", "Calm", "Excited", "Suspenseful"]
-)
-
-st.caption(
-    "Calm mode uses slower speech. Other moods are preferences; "
-    "gTTS does not provide true emotional voice control."
+st.markdown(
+    '<div class="section-note">A passage, a favourite quote, or a story you love.</div>',
+    unsafe_allow_html=True
 )
 
 uploaded_file = st.file_uploader(
-    "📄 Upload a text file (.txt)",
-    type=["txt"]
+    "Bring your own text",
+    type=["txt"],
+    help="Upload a plain text (.txt) file."
 )
+
+uploaded_text = ""
 
 if uploaded_file is not None:
     try:
         uploaded_text = uploaded_file.getvalue().decode("utf-8-sig")
     except UnicodeDecodeError:
-        uploaded_text = ""
         st.error("Please upload a UTF-8 encoded text file.")
-else:
-    uploaded_text = ""
 
 text_input = st.text_area(
-    "✍️ Enter your text",
+    "Your story",
     value=uploaded_text,
-    placeholder="Once upon a time...",
-    height=220
+    placeholder="Once upon a time... paste your words here.",
+    height=220,
+    label_visibility="collapsed"
 )
 
-if st.button("✨ Generate Audiobook", use_container_width=True):
+# -------------------- VOICE SETTINGS --------------------
+
+with st.expander("Voice and language settings", expanded=True):
+    languages = {
+        "English": "en",
+        "Hindi": "hi",
+        "French": "fr",
+        "Spanish": "es",
+        "Japanese": "ja",
+        "German": "de",
+        "Telugu": "te",
+        "Tamil": "ta"
+    }
+
+    language = st.selectbox(
+        "Choose a language",
+        list(languages.keys())
+    )
+
+    tone = st.selectbox(
+        "Choose a reading pace",
+        ["Neutral", "Calm", "Excited", "Suspenseful"]
+    )
+
+    st.caption(
+        "Calm uses slower speech. The other moods are preferences; "
+        "gTTS does not provide genuine emotional voice acting."
+    )
+
+# -------------------- GENERATE AUDIO --------------------
+
+st.write("")
+
+if st.button("♫   Let's listen", use_container_width=True):
     if not text_input.strip():
-        st.warning("Please enter text or upload a .txt file.")
+        st.warning("Add a little text first, and your story is ready to begin.")
     else:
         try:
-            with st.spinner("Creating your audiobook..."):
+            with st.spinner("Preparing your listening experience..."):
                 audio_buffer = BytesIO()
 
                 speech = gTTS(
@@ -104,11 +290,12 @@ if st.button("✨ Generate Audiobook", use_container_width=True):
                 speech.write_to_fp(audio_buffer)
                 audio_data = audio_buffer.getvalue()
 
-            st.success("Your audiobook is ready!")
+            st.success("Your story is ready. Make yourself comfortable.")
+
             st.audio(audio_data, format="audio/mp3")
 
             st.download_button(
-                "⬇️ Download Audiobook",
+                "↓   Keep a copy of your audiobook",
                 data=audio_data,
                 file_name="EchoVerse_Audiobook.mp3",
                 mime="audio/mpeg",
@@ -116,10 +303,17 @@ if st.button("✨ Generate Audiobook", use_container_width=True):
             )
 
         except Exception as error:
-            st.error("Audio generation failed. Check your internet connection.")
-            st.code(str(error))
+            st.error(
+                "We couldn't create the audio just now. "
+                "Please check your internet connection and try again."
+            )
+            with st.expander("Technical details"):
+                st.code(str(error))
 
-st.divider()
-st.caption("EchoVerse | Turning text into listening experiences 🎶")
+# -------------------- FOOTER --------------------
 
-            
+st.markdown("""
+<div class="footer">
+    made for the love of stories · echoverse ♡
+</div>
+""", unsafe_allow_html=True)
